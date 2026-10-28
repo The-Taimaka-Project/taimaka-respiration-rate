@@ -45,6 +45,10 @@ The result comes back in two extras:
 | `value`           | ODK Collect | the breath count, as text  |
 | `odk_intent_data` | CommCare    | the same value             |
 
+`docs/breath_count_test.xml` is a one-question test form. To try it, copy it into an ODK
+Collect project's `forms` folder, for example
+`/sdcard/Android/data/org.odk.collect.android/files/projects/<project>/forms/`.
+
 The app can also be opened from the launcher without a form. **Save result** then just closes it.
 
 ## Building
