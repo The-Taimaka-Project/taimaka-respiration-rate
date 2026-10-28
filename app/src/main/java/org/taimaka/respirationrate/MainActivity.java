@@ -81,10 +81,6 @@ public class MainActivity extends Activity {
         tapButton.setOnClickListener(v -> onBreath());
         restartButton.setOnClickListener(v -> reset());
         saveButton.setOnClickListener(v -> save());
-        // Opened from the launcher rather than from a form: there is nothing to save to.
-        if (getCallingActivity() == null) {
-            saveButton.setText(R.string.close);
-        }
 
         if (savedInstanceState != null) {
             state = savedInstanceState.getInt(KEY_STATE, STATE_READY);
