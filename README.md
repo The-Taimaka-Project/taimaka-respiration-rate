@@ -6,7 +6,7 @@ the count. **Save result** sends the number back to the form.
 
 It is modelled on Dimagi's [breath-counter](https://github.com/dimagi/breath-counter) for
 CommCare. It has no third-party libraries, no network access and no sound files. The release
-APK is under 20 KB and runs on Android 5.0 or newer.
+APK is about 20 KB and runs on Android 5.0 or newer.
 
 ![Ready, counting and result screens](docs/screenshots.png)
 
@@ -71,11 +71,50 @@ the returned value, start over, leaving mid-count and rotation.
 
 ### Release builds
 
-Release builds are shrunk with R8. To sign one, pass your keystore details as Gradle properties.
-They can go in `~/.gradle/gradle.properties` so they never live in the repository:
+Release builds are shrunk with R8 and must be signed before Android will install them. Keep the
+same key for every release, because Android only installs an update over a version signed with
+the same key. Losing the keystore or its password means users have to uninstall the app before
+installing a new version.
+
+#### Signing in GitHub Actions
+
+GitHub Actions runs the tests and builds the APKs on every push. When these four repository
+secrets are set, it also builds a signed release APK:
+
+| Secret                    | Value                                        |
+|---------------------------|----------------------------------------------|
+| `RELEASE_KEYSTORE_BASE64` | the keystore file, base64-encoded            |
+| `RELEASE_STORE_PASSWORD`  | the keystore password                        |
+| `RELEASE_KEY_ALIAS`       | the key alias, for example `breath-counter`  |
+| `RELEASE_KEY_PASSWORD`    | the key password (the same as the keystore password for a PKCS12 keystore) |
+
+The signed APK is attached to each run as part of the `apks` artifact, named
+`breath-counter-<versionName>.apk`.
+
+To publish a release, raise `versionCode` and `versionName` in `app/build.gradle`, commit, then
+push a tag starting with `v`:
+
+```bash
+git tag v1.1
+```
+
+```bash
+git push origin v1.1
+```
+
+This creates a GitHub Release with the signed APK attached. Phones only accept an update whose
+`versionCode` is higher than the installed one.
+
+The debug APKs from CI are signed with a throwaway key that changes on every run. They are fine
+for trying the app, but not for phones in the field.
+
+#### Signing locally
+
+Pass the same details as Gradle properties. They can go in `~/.gradle/gradle.properties` so they
+never live in the repository:
 
 ```properties
-RELEASE_STORE_FILE=/path/to/keystore.jks
+RELEASE_STORE_FILE=/path/to/breath-counter-release.jks
 RELEASE_STORE_PASSWORD=...
 RELEASE_KEY_ALIAS=...
 RELEASE_KEY_PASSWORD=...
@@ -85,13 +124,7 @@ RELEASE_KEY_PASSWORD=...
 ./gradlew assembleRelease
 ```
 
-Without these properties, `app-release-unsigned.apk` is produced instead. Keep the same key for
-every release, because Android only installs an update over a version signed with the same key.
-
-GitHub Actions runs the tests and builds both APKs on every push. They are attached to the run as
-the `apks` artifact. Each CI debug build is signed with a throwaway key, so you must uninstall
-the previous debug build before installing a new one. Use a signed release build for phones in
-the field.
+Without these properties, `app-release-unsigned.apk` is produced instead.
 
 ## Changing the app
 
