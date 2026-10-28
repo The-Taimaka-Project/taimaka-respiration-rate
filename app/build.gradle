@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace = 'org.taimaka.respirationrate'
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = 'org.taimaka.respirationrate'
+        minSdk = 21
+        targetSdk = 36
+        versionCode = 1
+        versionName = '1.0'
+    }
+
+    // Release signing is read from Gradle properties (e.g. ~/.gradle/gradle.properties or
+    // -P flags) so no keys live in the repository. Without them the release APK is unsigned.
+    def storeFilePath = project.findProperty('RELEASE_STORE_FILE')
+    if (storeFilePath) {
+        signingConfigs {
+            release {
+                storeFile = file(storeFilePath)
+                storePassword = project.findProperty('RELEASE_STORE_PASSWORD')
+                keyAlias = project.findProperty('RELEASE_KEY_ALIAS')
+                keyPassword = project.findProperty('RELEASE_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (storeFilePath) {
+                signingConfig = signingConfigs.release
+            }
+        }
+    }
+
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+// Test-only dependencies; the app itself has none.
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.17'
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Outlined rather than solid so it doesn't draw the eye (or thumb) while counting. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33C62828">
+    <item>
+        <shape>
+            <solid android:color="@color/background" />
+            <stroke
+                android:width="3dp"
+                android:color="@color/restart_text" />
+            <corners android:radius="@dimen/button_radius" />
+        </shape>
+    </item>
+</ripple>

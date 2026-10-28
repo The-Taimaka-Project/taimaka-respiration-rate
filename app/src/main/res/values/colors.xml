@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#FFFFFF</color>
+    <color name="text">#212121</color>
+    <color name="text_muted">#616161</color>
+    <color name="tap">#1565C0</color>
+    <color name="save">#2E7D32</color>
+    <color name="restart">#C62828</color>
+    <color name="disabled">#BDBDBD</color>
+    <color name="ripple">#55FFFFFF</color>
+</resources>

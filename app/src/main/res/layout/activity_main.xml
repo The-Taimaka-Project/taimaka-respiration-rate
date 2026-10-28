@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:orientation="vertical"
+    android:padding="@dimen/screen_padding">
+
+    <!-- Counting screen -->
+    <LinearLayout
+        android:id="@+id/counting_pane"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/StatLabel"
+                    android:text="@string/breaths_label" />
+
+                <TextView
+                    android:id="@+id/breath_count"
+                    style="@style/StatValue" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/StatLabel"
+                    android:text="@string/seconds_left_label" />
+
+                <TextView
+                    android:id="@+id/seconds_left"
+                    style="@style/StatValue" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/time_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:layout_marginTop="8dp"
+            android:max="60000" />
+
+        <TextView
+            android:id="@+id/hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:minLines="2"
+            android:textColor="@color/text"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/tap_button"
+            style="@style/BigButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_tap"
+            android:textSize="36sp" />
+    </LinearLayout>
+
+    <!-- Result screen -->
+    <LinearLayout
+        android:id="@+id/result_pane"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/times_up"
+                android:textColor="@color/text_muted"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/result_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text"
+                android:textSize="120sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/breaths_per_minute"
+                android:textColor="@color/text"
+                android:textSize="28sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/save_button"
+            style="@style/BigButton"
+            android:layout_width="match_parent"
+            android:layout_height="112dp"
+            android:background="@drawable/btn_save"
+            android:text="@string/save"
+            android:textSize="34sp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/restart_button"
+        style="@style/BigButton"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/btn_restart"
+        android:text="@string/start_over"
+        android:textColor="@color/restart_text"
+        android:textSize="24sp" />
+</LinearLayout>
