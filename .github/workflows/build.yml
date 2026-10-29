@@ -11,8 +11,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Secrets can't be tested in `if:` directly, so expose the keystore as an env var.
-      RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+      # Secrets can't be tested in `if:` directly. This holds only 'true' or 'false', so the
+      # keystore itself is never visible to steps other than the signing step.
+      HAS_SIGNING_KEY: ${{ secrets.RELEASE_KEYSTORE_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -27,16 +28,17 @@ jobs:
       # Signed release build. Runs only when the signing secrets are set, so forks and
       # pull requests from forks (which never receive secrets) still build.
       - name: Build signed release APK
-        if: env.RELEASE_KEYSTORE_BASE64 != ''
+        if: env.HAS_SIGNING_KEY == 'true'
         env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
           ORG_GRADLE_PROJECT_RELEASE_STORE_FILE: ${{ runner.temp }}/release.jks
           ORG_GRADLE_PROJECT_RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           ORG_GRADLE_PROJECT_RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           ORG_GRADLE_PROJECT_RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         run: |
+          trap 'rm -f "$ORG_GRADLE_PROJECT_RELEASE_STORE_FILE"' EXIT
           echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$ORG_GRADLE_PROJECT_RELEASE_STORE_FILE"
           ./gradlew assembleRelease
-          rm "$ORG_GRADLE_PROJECT_RELEASE_STORE_FILE"
           apk=app/build/outputs/apk/release/app-release.apk
           "$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)/apksigner" verify --print-certs "$apk"
           version=$(sed -n "s/.*versionName = '\(.*\)'.*/\1/p" app/build.gradle)
@@ -44,7 +46,7 @@ jobs:
           cp "$apk" "dist/breath-counter-$version.apk"
 
       - name: Build unsigned release APK
-        if: env.RELEASE_KEYSTORE_BASE64 == ''
+        if: env.HAS_SIGNING_KEY != 'true'
         run: ./gradlew assembleRelease
 
       - uses: actions/upload-artifact@v4
@@ -55,7 +57,7 @@ jobs:
             dist/*.apk
 
       - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v') && env.RELEASE_KEYSTORE_BASE64 != ''
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_SIGNING_KEY == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" dist/*.apk --title "$GITHUB_REF_NAME" --generate-notes
