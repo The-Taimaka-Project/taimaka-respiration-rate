@@ -77,27 +77,32 @@ Work the mode out in a calculate:
 
 If the age is missing, this falls back to the full count.
 
-Then put each count in its own group with a `body::intent` column:
+Then make each count its own page: a `field-list` group with a `body::intent` column, holding
+the rate and the three extra fields:
 
 | type | name | label | appearance | body::intent |
 |---|---|---|---|---|
-| begin_group | exam_breathing | Please watch the child's breathing while the child is calm. | field-list | |
-| begin_group | resp_rate_grp | Count breaths | | `org.taimaka.respirationrate.COUNT(mode=${rr_mode}, prefix='resp_rate')` |
+| begin_group | resp_rate_grp | Please watch the child's breathing while the child is calm, and count breaths. | field-list | `org.taimaka.respirationrate.COUNT(mode=${rr_mode}, prefix='resp_rate')` |
 | integer | resp_rate | Breaths per minute | | |
 | text | resp_rate_method | Counting method | | |
-| integer | resp_rate_quick | Quick-count estimate (validation only) | | |
+| text | resp_rate_quick | Quick-count estimate (validation only) | masked | |
 | text | resp_rate_taps | Tap times | masked | |
 | end_group | resp_rate_grp | | | |
-| … | | other breathing questions | | |
-| end_group | exam_breathing | | | |
+
+`masked` shows the validation data as dots, so health workers aren't shown the quick-count
+estimate. It only works on text fields, so `resp_rate_quick` is text; convert it to a number when
+analysing. The chest indrawing and nasal flaring questions move to their own page after this one.
 
 The re-counts work the same way, with `prefix='resp_rate_2'` and fields `resp_rate_2`,
-`resp_rate_2_method`, and so on. The existing `resp1_elev` calculations keep working unchanged.
+`resp_rate_2_method`, and so on, each group keeping its current `relevant` condition. The existing
+`resp1_elev`, `resp2_elev` and `resp3_elev` calculations keep working unchanged.
 
-Things ODK Collect requires:
+Things ODK Collect requires (checked with ODK Collect v2026.3.5):
 
-- **One app group per screen.** Collect only treats the first app group in a `field-list` as
-  one, so `resp_rate`, `resp_rate_2` and `resp_rate_3` each need their own `field-list` page.
+- **Each app group is its own page.** Putting the app group inside the existing
+  `exam_breathing` page crashes Collect when the page opens ("Attempt to invoke virtual method
+  ... TreeReference.toString ... on a null object reference"). Collect also only allows one app
+  group per page.
 - **Keep expressions out of the intent.** Collect splits the parameters on commas and `=`, so
   `mode=if(...)` breaks. Compute the mode in a calculate and pass `${rr_mode}`.
 - **The app must be installed.** Fields inside an app group are read-only, so the rate can't be
