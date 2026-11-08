@@ -3,21 +3,35 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="48dp"
     android:height="48dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path
-        android:fillColor="#1565C0"
-        android:pathData="M54,4a50,50 0,1 1,0 100a50,50 0,1 1,0 -100" />
-    <path
-        android:pathData="M54,38a20,20 0,1 1,0 40a20,20 0,1 1,0 -40"
-        android:strokeWidth="5"
-        android:strokeColor="#FFFFFF" />
-    <path
-        android:pathData="M54,58L54,46M54,58L62,64"
-        android:strokeLineCap="round"
-        android:strokeWidth="5"
-        android:strokeColor="#FFFFFF" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M48,28h12v5h-12zM52,33h4v6h-4z" />
+    android:viewportWidth="72"
+    android:viewportHeight="72">
+    <group
+        android:translateX="-18"
+        android:translateY="-18">
+        <path
+            android:fillColor="#1565C0"
+            android:pathData="M54,18a36,36 0,1 1,0 72a36,36 0,1 1,0 -72" />
+        <!-- Stopwatch ring and crown -->
+        <path
+            android:pathData="M54,35a23,23 0,1 1,0 46a23,23 0,1 1,0 -46"
+            android:strokeWidth="4.5"
+            android:strokeColor="#FFFFFF" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M48,27h12v4.5h-12zM52,31.5h4v4h-4z" />
+        <!-- Lungs -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M51,51C51,48 49,46.5 46.5,47.5C41,49.5 38,56 38,62.5C38,67.5 40.5,70.5 44,70C48,69.5 51,67.5 51,64.5Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M57,51C57,48 59,46.5 61.5,47.5C67,49.5 70,56 70,62.5C70,67.5 67.5,70.5 64,70C60,69.5 57,67.5 57,64.5Z" />
+        <!-- Windpipe and bronchi, which also read as the stopwatch hand -->
+        <path
+            android:pathData="M54,41L54,53M54,52.5L50.5,55.5M54,52.5L57.5,55.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:strokeWidth="3"
+            android:strokeColor="#FFFFFF" />
+    </group>
 </vector>

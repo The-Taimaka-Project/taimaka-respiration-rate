@@ -1,11 +1,13 @@
 # Breath Counter for ODK
 
+<img src="docs/icon.png" alt="App icon: lungs inside a stopwatch" width="96">
+
 A small Android app for counting a child's respiratory rate. ODK Collect opens it from a form,
 the health worker taps once for each breath, and **Save result** sends the rate back to the form.
 
 It is modelled on Dimagi's [breath-counter](https://github.com/dimagi/breath-counter) for
 CommCare. It has no third-party libraries, no network access and no sound files. The release
-APK is about 20 KB and runs on Android 5.0 or newer.
+APK is under 30 KB and runs on Android 5.0 or newer.
 
 ![Age picker, full count, quick count, quick result and the switch to a full count](docs/screenshots.png)
 
@@ -142,28 +144,120 @@ leaving mid-count and rotation.
 
 ### Release builds
 
-Release builds are shrunk with R8 and must be signed before Android will install them. Keep the
-same key for every release, because Android only installs an update over a version signed with
-the same key. Losing the keystore or its password means users have to uninstall the app before
-installing a new version.
+Release builds are shrunk with R8 and must be signed before phones will install them. Android
+only installs an update over a version signed with the same key, so **one key signs every
+release, forever**. If the key or its password is lost, every phone has to uninstall the app
+before it can install a new version.
 
-#### Signing in GitHub Actions
+The key lives in three places: your password manager (the master copy), the GitHub repository
+secrets (so CI can sign), and nowhere else.
 
-GitHub Actions runs the tests and builds the APKs on every push. When these four repository
-secrets are set, it also builds a signed release APK:
+#### 1. Create the key
 
-| Secret                    | Value                                        |
-|---------------------------|----------------------------------------------|
-| `RELEASE_KEYSTORE_BASE64` | the keystore file, base64-encoded            |
-| `RELEASE_STORE_PASSWORD`  | the keystore password                        |
-| `RELEASE_KEY_ALIAS`       | the key alias, for example `breath-counter`  |
-| `RELEASE_KEY_PASSWORD`    | the key password (the same as the keystore password for a PKCS12 keystore) |
+Run this on your own computer. `keytool` comes with Java. If you only have Android Studio, it's
+in Android Studio's `jbr/bin` folder.
 
-The signed APK is attached to each run as part of the `apks` artifact, named
-`breath-counter-<versionName>.apk`.
+```bash
+keytool -genkeypair -v -keystore breath-counter-release.jks -storetype PKCS12 -alias breath-counter -keyalg RSA -keysize 4096 -validity 10000
+```
 
-To publish a release, raise `versionCode` and `versionName` in `app/build.gradle`, commit, then
-push a tag starting with `v`:
+It asks for a password, then your name and organisation; "Taimaka" and the country are enough.
+Use a long generated password from your password manager. With this keystore type the key
+password is the same as the keystore password.
+
+#### 2. Turn it into text for the password manager
+
+The keystore is a binary file. Base64 turns it into one line of text, about 5,700 characters,
+that fits in a secure note.
+
+Mac:
+
+```bash
+base64 -i breath-counter-release.jks -o breath-counter-release.jks.b64
+```
+
+Linux:
+
+```bash
+base64 -w0 breath-counter-release.jks > breath-counter-release.jks.b64
+```
+
+Windows (PowerShell):
+
+```bash
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("$PWD\breath-counter-release.jks")) | Set-Content -NoNewline breath-counter-release.jks.b64
+```
+
+Note the certificate fingerprint too. It identifies the key, and lets you check later that an APK
+was signed with it:
+
+```bash
+keytool -list -v -keystore breath-counter-release.jks -storetype PKCS12 | grep SHA256
+```
+
+Make one password manager entry, for example "Breath Counter Android signing key", with:
+
+| Field | Value |
+|---|---|
+| Password | the keystore password |
+| Alias | `breath-counter` |
+| Keystore (base64) | the contents of `breath-counter-release.jks.b64` |
+| SHA-256 fingerprint | from the command above |
+
+#### 3. Check the copy before relying on it
+
+Copy the base64 text back out of the password manager into a new file, `restored.jks.b64`, and
+turn it back into a keystore.
+
+Mac or Linux:
+
+```bash
+base64 --decode < restored.jks.b64 > restored.jks
+```
+
+Windows (PowerShell):
+
+```bash
+[IO.File]::WriteAllBytes("$PWD\restored.jks", [Convert]::FromBase64String((Get-Content restored.jks.b64 -Raw).Trim()))
+```
+
+Then open it with the password from the password manager:
+
+```bash
+keytool -list -v -keystore restored.jks -storetype PKCS12 | grep SHA256
+```
+
+If it asks for the password, accepts it and prints the same fingerprint, the saved copy is good.
+
+#### 4. Give it to GitHub Actions
+
+In the repository on GitHub, go to **Settings → Secrets and variables → Actions → New repository
+secret** and add:
+
+| Secret | Value |
+|---|---|
+| `RELEASE_KEYSTORE_BASE64` | the base64 text, copied from the password manager |
+| `RELEASE_STORE_PASSWORD` | the password |
+| `RELEASE_KEY_ALIAS` | `breath-counter` |
+| `RELEASE_KEY_PASSWORD` | the same password again |
+
+GitHub never shows a secret again after it's saved. Only the step that signs the APK can read
+these, and builds from forks don't get them.
+
+#### 5. Clean up
+
+Delete `breath-counter-release.jks`, `breath-counter-release.jks.b64`, `restored.jks` and
+`restored.jks.b64` from your computer, and clear your clipboard. If you need the key on a
+computer again, decode it from the password manager as in step 3.
+
+#### 6. Build and publish
+
+After the secrets are added, every push to `main` builds a signed APK. It is in the run's `apks`
+download on the Actions tab, named `breath-counter-<versionName>.apk`. The run's "Build signed
+release APK" step prints the certificate's SHA-256 digest. It should be the fingerprint in the
+password manager, written in lower case without colons (`D3:71:46:…` appears as `d37146…`).
+
+To publish a release, push a tag for the version in `app/build.gradle`:
 
 ```bash
 git tag v1.1
@@ -173,21 +267,22 @@ git tag v1.1
 git push origin v1.1
 ```
 
-This creates a GitHub Release with the signed APK attached. Phones only accept an update whose
-`versionCode` is higher than the installed one.
+This creates a GitHub Release with the signed APK attached, ready to install on phones. For each
+later release, first raise `versionCode` and `versionName` in `app/build.gradle`. Phones only
+accept an update whose `versionCode` is higher than the installed one.
 
 The debug APKs from CI are signed with a throwaway key that changes on every run. They are fine
 for trying the app, but not for phones in the field.
 
-#### Signing locally
+#### Signing on your own computer
 
-Pass the same details as Gradle properties. They can go in `~/.gradle/gradle.properties` so they
-never live in the repository:
+Decode the keystore as in step 3, then pass the details as Gradle properties, for example in
+`~/.gradle/gradle.properties` so they never live in the repository:
 
 ```properties
-RELEASE_STORE_FILE=/path/to/breath-counter-release.jks
+RELEASE_STORE_FILE=/path/to/restored.jks
 RELEASE_STORE_PASSWORD=...
-RELEASE_KEY_ALIAS=...
+RELEASE_KEY_ALIAS=breath-counter
 RELEASE_KEY_PASSWORD=...
 ```
 
