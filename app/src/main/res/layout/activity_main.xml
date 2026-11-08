@@ -7,6 +7,108 @@
     android:orientation="vertical"
     android:padding="@dimen/screen_padding">
 
+    <!-- Which counting mode is in use; hidden on the age picker -->
+    <TextView
+        android:id="@+id/mode_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Age picker: only when the app is opened without a form -->
+    <LinearLayout
+        android:id="@+id/picker_pane"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/picker_title"
+            android:textColor="@color/text"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/pick_full_button"
+            style="@style/BigButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="24dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_tap"
+            android:text="@string/picker_under_2"
+            android:textSize="32sp" />
+
+        <Button
+            android:id="@+id/pick_quick_button"
+            style="@style/BigButton"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="24dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_tap_quick"
+            android:text="@string/picker_2_and_over"
+            android:textSize="32sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/picker_note"
+            android:textColor="@color/text_muted"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Error: the form sent a mode the app doesn't know -->
+    <LinearLayout
+        android:id="@+id/error_pane"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/error_title"
+            android:textColor="@color/restart"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/error_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:textColor="@color/text"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/close_button"
+            style="@style/BigButton"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/btn_tap"
+            android:text="@string/close"
+            android:textSize="28sp" />
+    </LinearLayout>
+
     <!-- Counting screen -->
     <LinearLayout
         android:id="@+id/counting_pane"
@@ -37,6 +139,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/seconds_left_column"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -98,9 +201,9 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/result_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/times_up"
                 android:textColor="@color/text_muted"
                 android:textSize="24sp" />
 
@@ -118,6 +221,15 @@
                 android:text="@string/breaths_per_minute"
                 android:textColor="@color/text"
                 android:textSize="28sp" />
+
+            <TextView
+                android:id="@+id/result_method"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textColor="@color/text_muted"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <Button

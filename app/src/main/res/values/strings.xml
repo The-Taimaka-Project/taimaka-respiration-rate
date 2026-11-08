@@ -2,16 +2,39 @@
 <resources>
     <string name="app_name">Breath Counter</string>
 
+    <!-- Mode banner, shown on every screen once the mode is known -->
+    <string name="mode_full">Under 2 years · Full 60-second count</string>
+    <string name="mode_quick">2 years and older · Quick count</string>
+    <string name="mode_switched">Breathing irregular · Switched to full 60-second count</string>
+
+    <!-- Age picker, shown only when the app is opened without a form -->
+    <string name="picker_title">How old is the child?</string>
+    <string name="picker_under_2">Under 2 years</string>
+    <string name="picker_2_and_over">2 years or older</string>
+    <string name="picker_note">The age decides how breaths are counted. To change it later, close the app and open it again.</string>
+
+    <!-- Shown when a form sends a mode the app doesn't know -->
+    <string name="error_title">This form needs fixing</string>
+    <string name="error_unknown_mode">The form asked for counting mode \"%1$s\". Only \"full\" and \"quick\" are allowed. Tell your supervisor.</string>
+    <string name="close">Close</string>
+
     <string name="breaths_label">Breaths</string>
     <string name="seconds_left_label">Seconds left</string>
 
-    <string name="hint_ready">Watch the chest. Tap at the first breath to start the 60-second timer.</string>
-    <string name="hint_counting">Tap once for every breath.</string>
+    <string name="hint_ready_full">Watch the chest. Tap at the first breath to start the 60-second timer.</string>
+    <string name="hint_ready_quick">Watch the chest. Tap at every breath in. The result appears after about 5 regular breaths.</string>
+    <string name="hint_counting_full">Tap once for every breath.</string>
+    <string name="hint_counting_quick">Keep tapping every breath until the result appears.</string>
+    <string name="hint_counting_switched">Keep tapping every breath until the 60 seconds are over.</string>
     <string name="tap_to_start">Tap to start</string>
     <string name="tap_each_breath">Tap each breath</string>
 
     <string name="times_up">Time is up</string>
+    <string name="quick_done">Quick count done</string>
     <string name="breaths_per_minute">breaths per minute</string>
+    <string name="method_full">Full 60-second count</string>
+    <string name="method_quick">Quick count: %1$d breaths in %2$d seconds</string>
+    <string name="method_switched">Full 60-second count (breathing was irregular)</string>
     <string name="save_result">Save result</string>
     <string name="start_over">Start over</string>
 </resources>
